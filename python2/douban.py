@@ -3,11 +3,11 @@
 import logging
 import requests as R
 from bs4 import BeautifulSoup as BS
-from exception import StopIterator
+#from exceptions import StopIteration
 
 def write (pict):
-    ''' download picture to directory
-
+    '''
+    download picture to directory
     :param pict: the url of picture
     '''
 
@@ -28,30 +28,39 @@ def write (pict):
 
     f.close()
 
-def body(first):
-    ''' parse page, get urls of picture
+def url(url):
+    '''
+    delete anchor in url
+    '''
+    return url.split("#")[0]
 
+def body(first):
+    '''
+    parse page, get urls of picture
     :param url: url of page
     :param _pict: url of picture
     '''
 
     if not first:
-        raise StopIterator
+        return #raise StopIteration("empty url!")
 
+    first = url(first)
     _next = first
     while True:
         rs = R.get(_next)
         if not rs.ok:
-            raise StopIterator
+            return #raise StopIteration("request failed!")
 
         _soup = BS(rs.content, "lxml")
         _next = _soup.find(id="next_photo").get("href")
         _pict = _soup.select("a.mainphoto img")[0].get("src")
 
         yield _pict
+        rs.close()
 
+        _next = url(_next)
         if _next == first:
-            raise StopIterator
+            return #raise StopIteration("normal end!")
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
