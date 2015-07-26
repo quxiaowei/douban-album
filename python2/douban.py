@@ -1,38 +1,68 @@
+# -*- coding: UTF-8 -*-
+
+import logging
 import requests as R
 from bs4 import BeautifulSoup as BS
+from exception import StopIterator
 
 def write (pict):
+    ''' download picture to directory
+
+    :param pict: the url of picture
+    '''
+
     f = open("./"+pict.rsplit("/", 1)[1], "wb")
+
+#   try large one
     rs = R.get(pict)
     if rs.ok:
         f.write(rs.content)
         rs.close()
     else:
-        rs2 = R.get(pict.replace("photo/large","photo/phote"))
+#       get url of normal-size picture
+        pict = pict.replace("photo/large", "photo/photo")
+        rs2 = R.get(pict)
         if rs2.ok:
             f.write(rs2.content)
         rs2.close()
+
     f.close()
 
-def body(url):
-    rs = R.get(url)
-    if not rs.ok:
-        print rs.status
-        return "", ""
-    soup = BS(rs.content, "lxml")
-    _next = soup.find(id="next_photo").get("href")
-    _pict = soup.select("a.mainphoto img")[0].get("src")
-#    print _next, _pict
-    return _next, _pict
+def body(first):
+    ''' parse page, get urls of picture
+
+    :param url: url of page
+    :param _pict: url of picture
+    '''
+
+    if not first:
+        raise StopIterator
+
+    _next = first
+    while True:
+        rs = R.get(_next)
+        if not rs.ok:
+            raise StopIterator
+
+        _soup = BS(rs.content, "lxml")
+        _next = _soup.find(id="next_photo").get("href")
+        _pict = _soup.select("a.mainphoto img")[0].get("src")
+
+        yield _pict
+
+        if _next == first:
+            raise StopIterator
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    logger.info("Starting...")
+
     _first = "http://www.douban.com/photos/photo/2019891834/"
-    _next = _first
-    _pict = ""
-    for i in range(1):
-        _next, _pict = body(_next)
-        if _next == _first or _next == "":
-            break
-        write(_pict)
+
+    for i in body(_first):
+        write(i)
+
     print "End"
 
