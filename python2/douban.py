@@ -54,9 +54,9 @@ def body(first):
         _soup = BS(rs.content, "lxml")
         _next = _soup.find(id="next_photo").get("href")
         _pict = _soup.select("a.mainphoto img")[0].get("src")
-
-        yield _pict
         rs.close()
+        
+        yield _pict
 
         _next = url(_next)
         if _next == first:
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     logger.info("Starting...")
 
-    _first = "http://www.douban.com/photos/photo/2019891834/"
+    _first = "http://www.douban.com/photos/photo/xxxxxxxxxx/"
 
     for i in body(_first):
         write(i)
