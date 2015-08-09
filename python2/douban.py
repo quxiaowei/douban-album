@@ -54,9 +54,9 @@ def body(first):
         _soup = BS(rs.content, "lxml")
         _next = _soup.find(id="next_photo").get("href")
         _pict = _soup.select("a.mainphoto img")[0].get("src")
-
-        yield _pict
         rs.close()
+        
+        yield _pict
 
         _next = url(_next)
         if _next == first:
@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
 #   [notice]
 #   replace the url below with url of any page within the album
-    _first = "http://www.douban.com/photos/photo/xxxxxxxx/"
+    _first = "http://www.douban.com/photos/photo/xxxxxxxxxx/"
 
     for i in body(_first):
         write(i)
