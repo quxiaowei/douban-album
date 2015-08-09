@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding:utf-8 -*-
 
 import logging
 import requests as R
@@ -13,7 +13,7 @@ def write (pict):
 
     f = open("./"+pict.rsplit("/", 1)[1], "wb")
 
-#   try large one
+#   try to get url of the large version pic
     rs = R.get(pict)
     if rs.ok:
         f.write(rs.content)
@@ -36,7 +36,7 @@ def url(url):
 
 def body(first):
     '''
-    parse page, get urls of picture
+    parse page, return a pic-url generator
     :param url: url of page
     :param _pict: url of picture
     '''
@@ -68,10 +68,11 @@ if __name__ == "__main__":
 
     logger.info("Starting...")
 
-    _first = "http://www.douban.com/photos/photo/2019891834/"
+#   [notice]
+#   replace the url below with url of any page within the album
+    _first = "http://www.douban.com/photos/photo/xxxxxxxx/"
 
     for i in body(_first):
         write(i)
 
     print "End"
-
