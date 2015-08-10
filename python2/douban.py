@@ -1,6 +1,6 @@
+#!/usr/local/bin/python
 # -*- coding:utf-8 -*-
 
-import logging
 import requests as R
 from bs4 import BeautifulSoup as BS
 #from exceptions import StopIteration
@@ -25,7 +25,7 @@ def write (pict):
         if rs2.ok:
             f.write(rs2.content)
         rs2.close()
-
+    
     f.close()
 
 def url(url):
@@ -46,33 +46,44 @@ def body(first):
 
     first = url(first)
     _next = first
+    _i = 0
     while True:
-        rs = R.get(_next)
+	_i = _i + 1
+        try:
+            rs = R.get(_next)
+        except Exception as e:
+            print(e)
+            return
+        
         if not rs.ok:
             return #raise StopIteration("request failed!")
 
-        _soup = BS(rs.content, "lxml")
+        _soup = BS(rs.content, "html.parser")
         _next = _soup.find(id="next_photo").get("href")
         _pict = _soup.select("a.mainphoto img")[0].get("src")
         rs.close()
         
-        yield _pict
+        yield _i, _pict
 
         _next = url(_next)
         if _next == first:
             return #raise StopIteration("normal end!")
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
-
-    logger.info("Starting...")
+    print("Start.")
 
 #   [notice]
 #   replace the url below with url of any page within the album
-    _first = "http://www.douban.com/photos/photo/xxxxxxxxxx/"
+    _first = "http://www.douban.com/photos/photo/2180595358/"
+    _n, _y = 0, 0
+    for _i, _pict in body(_first):
+        try:
+            write(_pict)
+        except Exception as e:
+            print("#%3d Failed:  %s"%(_i, _pict))
+            _n = _n + 1
+        else:
+            print("#%3d Success: %s"%(_i, _pict))
+            _y = _y + 1
 
-    for i in body(_first):
-        write(i)
-
-    print "End"
+    print("End. %d downloaded, %d failed"%(_y, _n))
