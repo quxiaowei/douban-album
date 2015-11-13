@@ -10,18 +10,18 @@ def write(pict):
     :param pict: the url of picture
     '''
     with open("./"+pict.rsplit("/", 1)[1], "wb") as f:
-		# try to get url of the large version pic
-		rs = R.get(pict)
-		if rs.ok:
-			f.write(rs.content)
-			rs.close()
-		else:
-			# get url of normal-size picture
-			pict = pict.replace("photo/large", "photo/photo")
-			rs2 = R.get(pict)
-			if rs2.ok:
-				f.write(rs2.content)
-			rs2.close()
+        # try to get url of the large version pic
+        rs = R.get(pict)
+        if rs.ok:
+            f.write(rs.content)
+            rs.close()
+        else:
+            # get url of normal-size picture
+            pict = pict.replace("photo/large", "photo/photo")
+            rs2 = R.get(pict)
+            if rs2.ok:
+                f.write(rs2.content)
+            rs2.close()
     
 def url(url):
     '''
@@ -46,7 +46,7 @@ def body(start):
             print(e)
             return
         
-    	if not rs.ok: return
+        if not rs.ok: return
 
         _soup = BS(rs.content, "html.parser")
         _next = _soup.find(id="next_photo").get("href")
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     start = "http://www.douban.com/photos/photo/2180595358/"
     success, fail, total = 0, 0, 0
     for pict in body(start):
-	total = total + 1
+    total = total + 1
         try:
             write(pict)
         except Exception as e:
