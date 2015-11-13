@@ -4,28 +4,25 @@
 import requests as R
 from bs4 import BeautifulSoup as BS
 
-def write (pict):
+def write(pict):
     '''
     download picture to directory
     :param pict: the url of picture
     '''
-    f = open("./"+pict.rsplit("/", 1)[1], "wb")
-
-    # try to get url of the large version pic
-    rs = R.get(pict)
-    if rs.ok:
-        f.write(rs.content)
-        rs.close()
-    else:
-        # get url of normal-size picture
-        pict = pict.replace("photo/large", "photo/photo")
-        rs2 = R.get(pict)
-        if rs2.ok:
-            f.write(rs2.content)
-        rs2.close()
+    with open("./"+pict.rsplit("/", 1)[1], "wb") as f:
+		# try to get url of the large version pic
+		rs = R.get(pict)
+		if rs.ok:
+			f.write(rs.content)
+			rs.close()
+		else:
+			# get url of normal-size picture
+			pict = pict.replace("photo/large", "photo/photo")
+			rs2 = R.get(pict)
+			if rs2.ok:
+				f.write(rs2.content)
+			rs2.close()
     
-    f.close()
-
 def url(url):
     '''
     delete anchor in url
